@@ -21,7 +21,7 @@ do
         TextColor = Color3.fromRGB(255, 255, 255),
         KeyColor = Color3.fromRGB(180, 180, 180),
         Width = 200,
-        Position = UDim2.new(0, 25, 0, 250),
+        Position = UDim2.new(0, 25, 0, 260),
         UseBlur = true,
         UseShadow = true,
     }

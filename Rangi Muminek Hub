@@ -1,0 +1,110 @@
+    -- == System Rang == --
+    loadstring(game:HttpGet("https://pastebin.com/raw/wY0zjBQg"))()
+    do
+    -- 1. Nazwa Folderu Rank
+    local FOLDER_NAME = "MuminekRangs"
+
+    -- 2. LISTA DOZWOLONYCH RANG (dla bezpieczeństwa – ignorujemy inne pliki)
+    local ALLOWED_RANKS = {
+        ["Owner"] = true,
+        ["Moderator"] = true,
+        ["Premium"] = true,
+    }
+    -- 3. TWORZENIE FOLDERU
+    if not isfolder(FOLDER_NAME) then
+        local success, err = pcall(makefolder, FOLDER_NAME)
+        if success then
+            print("[System Rang] Folder utworzony: " .. FOLDER_NAME)
+        else
+            warn("[System Rang] Nie udało się utworzyć folderu: " .. tostring(err))
+        end
+    end
+
+    -- 4. SPRAWDZANIE PLIKÓW Z RANGAMI
+    local foundRank = nil
+    local foundFile = nil
+
+    -- Pobieramy listę plików w folderze
+    local files = listfiles(FOLDER_NAME)
+    for _, filePath in pairs(files) do
+        -- Wyciągamy samą nazwę pliku (bez ścieżki)
+        local fileName = filePath:match("([^/\\]+)$")
+        if fileName then
+            -- Sprawdzamy, czy plik ma rozszerzenie .txt
+            local rankName = fileName:match("^(.+)%.txt$")
+            if rankName and ALLOWED_RANKS[rankName] then
+                foundRank = rankName
+                foundFile = filePath
+                break
+            end
+        end
+    end
+
+    -- 5. USTAWIENIE ZMIENNYCH GLOBALNYCH I WYKONANIE AKCJI
+    if foundRank then
+        -- Ustaw globalną zmienną z rangą
+        _G.PlayerRank = foundRank
+        _G.IsRanked = true
+
+        -- Wyświetl powiadomienie o rangie
+        if Notification then
+            Notification.new({
+                Title = "Ranga: " .. foundRank,
+                Content = "Masz dostęp do funkcji przypisanych do rangi " .. foundRank .. ".",
+                Duration = 5,
+            })
+        end
+
+        -- Log
+        if Logging and Logging.new then
+            Logging.new("shield-lock", "Zweryfikowano rangę: " .. foundRank, 5)
+        end
+
+        --  KOD DLA POSZCZEGÓLNYCH RANG
+        -- Owner
+        if foundRank == "Owner" then
+            Owner = true
+            User = false
+            -- Moderator
+        elseif foundRank == "Moderator" then
+            Moderator = true -- Moderator Rank
+            User = false
+            -- Premium
+        elseif foundRank == "Premium" then
+            Premium = true
+            User = false
+        end
+    else
+        -- Jeśli brak rangi – ustaw domyślne zmienne
+        _G.PlayerRank = "User"
+        _G.IsRanked = false
+        _G.IsPremium = false
+        _G.IsModerator = false
+
+        if Logging and Logging.new then
+            Logging.new("person", "Brak przypisanej rangi – tryb podstawowy", 3)
+            end
+        end
+    end 
+
+    -- Rozszerzenie Kolorow Dla Indicaotrow
+    do
+    local colorTable = Indicator.Color  
+    
+    if colorTable then
+        colorTable.Red = Color3.fromRGB(255, 0, 0)
+        colorTable.Green = Color3.fromRGB(0, 255, 0)
+        colorTable.Blue = Color3.fromRGB(0, 0, 255)
+        colorTable.Yellow = Color3.fromRGB(255, 255, 0)
+        colorTable.Orange = Color3.fromRGB(255, 165, 0)
+        colorTable.White = Color3.fromRGB(255, 255, 255)
+        colorTable.Pink = Color3.fromRGB(255, 105, 180)
+        colorTable.Purple = Color3.fromRGB(160, 32, 240)
+        colorTable.Cyan = Color3.fromRGB(0, 255, 255)
+        colorTable.Gold = Color3.fromRGB(255, 215, 0)
+        colorTable.Lime = Color3.fromRGB(50, 205, 50)
+        colorTable.Magenta = Color3.fromRGB(255, 0, 255)
+        colorTable.Silver = Color3.fromRGB(192, 192, 192)
+        colorTable.Teal = Color3.fromRGB(0, 128, 128)
+        end
+    end

@@ -1,5 +1,5 @@
     -- == Preferencje Koloru == --
-    local MuminekHub = loadstring(game:HttpGet("https://pastebin.com/raw/wY0zjBQg"))()
+    loadstring(game:HttpGet("https://pastebin.com/raw/wY0zjBQg"))()
     
     do local PREFERENCES_FOLDER = "Muminek_Preferences"
 

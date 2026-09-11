@@ -1,5 +1,5 @@
     -- == System Rang == --
-    loadstring(game:HttpGet("https://pastebin.com/raw/wY0zjBQg"))()
+    --loadstring(game:HttpGet("https://pastebin.com/raw/wY0zjBQg"))()
     do
     -- 1. Nazwa Folderu Rank
     local FOLDER_NAME = "MuminekRangs"

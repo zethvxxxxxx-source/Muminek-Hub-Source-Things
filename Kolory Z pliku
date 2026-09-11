@@ -16,6 +16,13 @@ do
         ["Szary"]        = Color3.fromRGB(180, 180, 180),
     }
 
+    -- ✅ POBIERZ GLOBALNIE
+    local Hub = getgenv().MuminekHub or _G.MuminekHub
+    if not Hub then
+        warn("[Preferences] MuminekHub nie znaleziony – pomijam kolory")
+        return
+    end
+
     -- 1. Folder
     if not isfolder(PREFERENCES_FOLDER) then
         pcall(makefolder, PREFERENCES_FOLDER)
@@ -40,9 +47,9 @@ do
 
     -- 3. Zastosowanie koloru
     if appliedColor then
-        MuminekHub.AccentColor = appliedColor
+        Hub.AccentColor = appliedColor
     else
-        MuminekHub.AccentColor = COLOR_MAP["Niebieski"]
+        Hub.AccentColor = COLOR_MAP["Niebieski"]
     end
 
     -- 4. Funkcja zapisu

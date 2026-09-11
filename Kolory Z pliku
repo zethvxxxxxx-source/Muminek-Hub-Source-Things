@@ -1,9 +1,11 @@
-    -- == Preferencje Koloru == --
-    --loadstring(game:HttpGet("https://pastebin.com/raw/wY0zjBQg"))()
-    
-    do local PREFERENCES_FOLDER = "Muminek_Preferences"
+-- =============================================================
+--  PREFERENCJE KOLORU – Muminek Hub
+--  Wklej PO załadowaniu biblioteki (MuminekHub, Notification, Logging)
+-- =============================================================
+do
+    local PREFERENCES_FOLDER = "Muminek_Preferences"
 
-    -- Kolory
+    -- === MAPA KOLORÓW ===
     local COLOR_MAP = {
         ["Niebieski"]    = Color3.fromRGB(78, 127, 252),
         ["Czerwony"]     = Color3.fromRGB(255, 0, 0),
@@ -19,41 +21,86 @@
         ["Szary"]        = Color3.fromRGB(180, 180, 180),
     }
 
-        -- 1. TWORZENIE FOLDERU
-        if not isfolder(PREFERENCES_FOLDER) then local success, err = pcall(makefolder, PREFERENCES_FOLDER)
-        if success then print("[Preferences] Folder utworzony: " .. PREFERENCES_FOLDER)
-        else warn("[Preferences] Nie udało się utworzyć folderu: " .. tostring(err)) end end
+    -- === 1. TWORZENIE FOLDERU ===
+    if not isfolder(PREFERENCES_FOLDER) then
+        local success, err = pcall(makefolder, PREFERENCES_FOLDER)
+        if success then
+            print("[Preferences] Folder utworzony: " .. PREFERENCES_FOLDER)
+        else
+            warn("[Preferences] Nie udało się utworzyć folderu: " .. tostring(err))
+        end
+    end
 
-        -- === 2. SPRAWDZANIE PLIKÓW TXT ===
-        local appliedColor = nil local appliedColorName = nil 
-        local files = listfiles(PREFERENCES_FOLDER) for _, filePath in pairs(files) do
+    -- === 2. SPRAWDZANIE PLIKÓW TXT ===
+    local appliedColor = nil
+    local appliedColorName = nil
 
-        -- Wyciągamy nazwę pliku (bez ścieżki)
-        local fileName = filePath:match("([^/\\]+)$")
-        if fileName then
+    local ok, files = pcall(listfiles, PREFERENCES_FOLDER)
+    if ok and files then
+        for _, filePath in pairs(files) do
+            local fileName = filePath:match("([^/\\]+)$")
+            if fileName then
+                local colorName = fileName:match("^(.+)%.txt$")
+                if colorName and COLOR_MAP[colorName] then
+                    appliedColor = COLOR_MAP[colorName]
+                    appliedColorName = colorName
+                    break
+                end
+            end
+        end
+    end
 
-        -- Sprawdzamy rozszerzenie .txt
-        local colorName = fileName:match("^(.+)%.txt$") if colorName and COLOR_MAP[colorName] then
-        appliedColor = COLOR_MAP[colorName] appliedColorName = colorName break end end end
+    -- === 3. ZASTOSOWANIE KOLORU ===
+    if appliedColor then
+        MuminekHub.AccentColor = appliedColor
 
-        -- 3. Zastosowanie Koloru
-        if appliedColor then MuminekHub.AccentColor = appliedColor
-        if Notification then Notification.new({ Title = "Preferences", Content = "Wczytano kolor: " .. appliedColorName, Duration = 4, }) end
-        if Logging and Logging.new then Logging.new("paint-brush", "Kolor ustawiony z preferencji: " .. appliedColorName, 5) end else
+        if Notification and Notification.new then
+            Notification.new({
+                Title = "Preferences",
+                Content = "Wczytano kolor: " .. appliedColorName,
+                Duration = 4,
+            })
+        end
 
+        if Logging and Logging.new then
+            Logging.new("paint-brush", "Kolor ustawiony z preferencji: " .. appliedColorName, 5)
+        end
+    else
         -- Brak pliku z kolorem – użyj domyślnego
         MuminekHub.AccentColor = COLOR_MAP["Niebieski"]
-        if Logging and Logging.new then Logging.new("paint-brush", "Brak preferencji – użyto domyślnego (Niebieski)", 3) end end
 
-        -- === 4. FUNKCJA POMOCNICZA – zapis preferencji ===
-        function _G.SaveColorPreference(colorName) 
-        if not COLOR_MAP[colorName] then warn("[Preferences] Nieznany kolor: " .. tostring(colorName)) return false end
+        if Logging and Logging.new then
+            Logging.new("paint-brush", "Brak preferencji – użyto domyślnego (Niebieski)", 3)
+        end
+    end
+
+    -- === 4. FUNKCJA POMOCNICZA – zapis preferencji ===
+    function _G.SaveColorPreference(colorName)
+        if not COLOR_MAP[colorName] then
+            warn("[Preferences] Nieznany kolor: " .. tostring(colorName))
+            return false
+        end
 
         -- Usuń stare pliki TXT w folderze
-        local files = listfiles(PREFERENCES_FOLDER) for _, filePath in pairs(files) do local name = filePath:match("([^/\\]+)$") 
-        if name and name:match("%.txt$") then pcall(delfile, filePath) end end
+        local ok2, existing = pcall(listfiles, PREFERENCES_FOLDER)
+        if ok2 and existing then
+            for _, filePath in pairs(existing) do
+                local name = filePath:match("([^/\\]+)$")
+                if name and name:match("%.txt$") then
+                    pcall(delfile, filePath)
+                end
+            end
+        end
 
         -- Zapisz nowy plik
-        local success = pcall(function() writefile(PREFERENCES_FOLDER .. "/" .. colorName .. ".txt", colorName)end) 
-        if success then print("[Preferences] Zapisano preferencję: " .. colorName) return true end return false end end
+        local success = pcall(function()
+            writefile(PREFERENCES_FOLDER .. "/" .. colorName .. ".txt", colorName)
+        end)
+
+        if success then
+            print("[Preferences] Zapisano preferencję: " .. colorName)
+            return true
+        end
+        return false
+    end
 end

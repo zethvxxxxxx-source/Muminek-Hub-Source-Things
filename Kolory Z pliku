@@ -56,3 +56,4 @@
         -- Zapisz nowy plik
         local success = pcall(function() writefile(PREFERENCES_FOLDER .. "/" .. colorName .. ".txt", colorName)end) 
         if success then print("[Preferences] Zapisano preferencję: " .. colorName) return true end return false end end
+end
